@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER: airflow 
+      - POSTGRES_PASSWORD: airflow 
+      - POSTGRES_DB: airflow 
+    volumes:
+      -postgres_data:/var/lib/postgresql/data 
+
+    redis: 
+      image: redis:6.2
+
+    airflow:
+      build: . 
+      depends_on:
+        - postgres 
+        - redis 
+      environment: 
+        AIRFLOW__CORE__EXECUTOR: LocalExecutor
+        AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+        AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+        AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+        AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      volumes: 
+        - ./dags:/opt/airflow/dags
+        - ./logs:/opt/airflow/logs
+        - ./plugins:/opt/airflow/plugins
+      ports: 
+        - "8080:8080"
+      command: > 
+        bash -c "
+        airflow db init &&
+        airflow users create -u admin -p admin -r Admin -e admin@example.com -f Admin -l User &&
+        airflow webserver & airflow scheduler
+        "
+volumes:
+  postgres_data:
+    driver: local 
+  logs: 
+    driver: local 
+  plugins: 
+    driver: local 
+    
