@@ -1,3 +1,4 @@
+# Импорт библиотек
 import pandas as pd
 from keras.optimizers import Adam
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
