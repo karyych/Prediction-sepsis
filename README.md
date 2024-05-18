@@ -45,12 +45,12 @@
 ## Структура проекта 
 ├── DAG
 │   └── airflow_dag.py       # Определения DAG для Apache Airflow <br>
-├── JUPYTER
+├── JUPYTER                                                       <br>
 │   ├── ANN.ipynb            # Jupyter Notebook для модели ANN    <br>
 │   └── LSTM.ipynb           # Jupyter Notebook для модели LSTM   <br>
-├── MLflow
+├── MLflow                                                        <br>
 │   └── Meta-model.py        # Скрипт оркестрации метамодели      <br>
-├── MODELS
+├── MODELS                                                        <br>
 │   ├── ANN.py               # Определение и обучение модели ANN  <br>
 │   └── LSTM.py              # Определение и обучение модели LSTM <br>
 ├── dockerfile               # Dockerfile для развертывания проекта <br>
