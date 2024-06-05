@@ -8,10 +8,79 @@ from tensorflow.keras.callbacks import Callback, EarlyStopping
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
+# Расчет SOFA
+def calculate_sofa(row):
+    sofa = 0
+    sofa_params = {
+        'Respiration': 'Resp',
+        'Platelets': 'Platelets',
+        'Liver': 'Bilirubin_total',
+        'Cardiovascular': 'MAP',
+        'Kidney': 'Creatinine'
+    }
+    for component, column in sofa_params.items():
+        value = row[column]
+        if component == 'Respiration':
+            if value < 400:
+                sofa += 0
+            elif value < 300:
+                sofa += 1
+            elif value < 200:
+                sofa += 2
+            elif value < 100:
+                sofa += 3
+            else:
+                sofa += 4
+        elif component == 'Platelets':
+            if value < 20:
+                sofa += 4
+            elif value < 50:
+                sofa += 3
+            elif value < 100:
+                sofa += 2
+            elif value < 150:
+                sofa += 1
+            else:
+                sofa += 0
+        elif component == 'Liver':
+            if value < 1.2:
+                sofa += 0
+            elif value < 2:
+                sofa += 1
+            elif value < 6:
+                sofa += 2
+            elif value < 12:
+                sofa += 3
+            else:
+                sofa += 4
+        elif component == 'Cardiovascular':
+            if value < 70:
+                sofa += 1
+            else:
+                sofa += 0
+        elif component == 'Kidney':
+            if value < 1.2:
+                sofa += 0
+            elif value < 2:
+                sofa += 1
+            elif value < 3.5:
+                sofa += 2
+            elif value < 5:
+                sofa += 3
+            else:
+                sofa += 4
+
+    day_of_week = row['timestamp'].dayofweek
+    if day_of_week == 5 or day_of_week == 6: 
+        sofa += 1
+
+    return sofa
 
 # Извлечение данных
 def load_and_preprocess_data(file_path):
     data = pd.read_csv(file_path)
+    data['timestamp'] = pd.to_datetime(data['timestamp'])
+    data['SOFA'] = data.apply(calculate_sofa, axis=1)
     columns_drop = ["Unnamed: 0.1", "Unnamed: 0", "timestamp"]
     data.drop(columns_drop, axis=1, inplace=True)
     X = data.drop("SOFA", axis=1).values
